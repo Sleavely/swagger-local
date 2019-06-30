@@ -2,6 +2,8 @@
 
 > Open up local Swagger files without exposing them to the web.
 
+[Github](https://github.com/Sleavely/swagger-local) | [NPM](https://www.npmjs.com/package/swagger-local)
+
 ## Install
 
 ```
