@@ -1,6 +1,6 @@
 {
   "name": "swagger-local",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Opens local Swagger files in the Swagger UI",
   "main": "index.js",
   "bin": {
