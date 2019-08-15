@@ -5,7 +5,7 @@ const getStdin = require('get-stdin')
 const meow = require('meow')
 const ora = require('ora')
 
-const self = require('./package.json')
+const self = require('../package.json')
 const main = require('.')
 
 const cli = meow(`
