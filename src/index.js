@@ -6,7 +6,7 @@ const path = require('path')
 const { promisify } = require('util')
 const swaggerUi = require('swagger-ui-express')
 const yaml = require('js-yaml')
-
+//TODO: support --watch with chokidar?
 const readFile = promisify(fs.readFile)
 
 let PORT = process.env.PORT || Math.floor(Math.random() * (56000 - 25000 + 1) + 25000)
