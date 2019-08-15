@@ -4,7 +4,9 @@
 const getStdin = require('get-stdin')
 const meow = require('meow')
 const ora = require('ora')
+const path = require('path')
 
+const { getDirectoryFiles, lstatAsync } = require('./utils/fs')
 const self = require('../package.json')
 const main = require('.')
 
@@ -13,6 +15,9 @@ Usage
   $ ${Object.keys(self.bin)[0]} <swaggerfile>
 
 Starts a temporary local Swagger server
+
+The swaggerfile argument can be either a file or
+a directory containing swagger.y[a]ml
 
 Options
   --help
@@ -34,10 +39,12 @@ ${self.homepage}
   },
 })
 
-const input = cli.input[0]
+let input = cli.input[0]
 
 if (!input && process.stdin.isTTY) {
-  cli.showHelp()
+  // Use '.' to look through current dir
+  input = '.'
+  // cli.showHelp()
 }
 
 if (cli.flags.port) {
@@ -45,6 +52,7 @@ if (cli.flags.port) {
 }
 
 const spinners = {
+  directory: ora(),
   input: ora(),
   stdin: ora(),
   server: ora(),
@@ -55,7 +63,7 @@ const fail = (err) => {
   for (let step in spinners) {
     if (spinners[step].isSpinning) spinners[step].fail()
   }
-  console.error(`\n${err.stack}`)
+  if (err) console.error(`\n${err.stack}`)
   process.exit(1)
 }
 
@@ -80,6 +88,22 @@ const showDoc = async (swaggerDocument) => {
 
 (async () => {
   if (input) {
+    const resolvedInput = path.resolve(process.cwd(), input)
+    const inputStat = await lstatAsync(resolvedInput)
+    if (inputStat.isDirectory()) {
+      spinners.directory.start(`searching ${input} for swagger files..`)
+      // Lets try to find a default file (swagger\.ya?ml)
+      const dirFiles = await getDirectoryFiles(resolvedInput)
+      const swaggerFileName = dirFiles.find((item) => !!item.match(/^swagger\.ya?ml$/))
+      if (!swaggerFileName) {
+        spinners.directory.fail(`Could not find a swagger file in "${input}"`)
+        fail()
+      }
+
+      spinners.directory.succeed(`Found ${[input, swaggerFileName].join(input.endsWith('/') ? '' : '/')}`)
+      // point `input` to that file
+      input = path.resolve(resolvedInput, swaggerFileName)
+    }
     spinners.input.start(`Opening ${input}..`)
     const swaggerDocument = await main.loadYaml(input)
     spinners.input.succeed(`Parsed ${input}`)

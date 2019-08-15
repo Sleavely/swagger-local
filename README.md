@@ -10,6 +10,8 @@
 $ npm i -g swagger-local
 ```
 
+Node 8+ is required.
+
 ## Usage
 
 ```
@@ -19,6 +21,10 @@ $ swagger-local --help
     $ swagger-local <swaggerfile>
 
   Starts a temporary local Swagger server
+
+  The swaggerfile argument can be either a file or
+  a directory containing swagger.y[a]ml
+
 
   Options
     --help
